@@ -1,0 +1,17 @@
+<html>
+<head>
+<title>KOKMS Toppage</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<h1>KOKMS top page</h1>
+Please upload csv file with password.<br />
+
+<form method="post" action="/upload" enctype="multipart/form-data">
+	<input type="password" size=20 placeholder="One time password" name="password" />
+	<input type="file" name="csvfile">
+	<input type="submit" value="Upload">
+</form>
+
+</body>
+</html>
