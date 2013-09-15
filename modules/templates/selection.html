@@ -8,13 +8,15 @@
 		<!-- Title input -->
 		ページタイトル<input type="text" size=20 name="title">
 		<br />
+
+		対象日:
 		<!-- Date selection -->
 		<select name="begindate">
 		{% for date in dates %}
 			<option name="<{{ date }}"> {{ date }} </item> 
 		{% endfor %}
 		</select>
-
+		～
 		<select name="enddate">
 		{% for date in dates %}
 			<option name="<{{ date }}"> {{ date }} </item> 
