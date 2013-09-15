@@ -24,15 +24,18 @@
 		<!-- Name enumeration -->
 		<table border>
 			<tbody>
-				{% for name in names %}
-				<tr>
-					<td> <input type="radio" name="target" value="{{ name }}" /> {{name}} </td>
-					<td> 源泉徴収: </td>
-					<td><input type="text" size=3 name="rate" />%</td>
+					{% for name in names %}
+					<tr>
+					<td colspan=4> <input type="radio" name="target" value="{{ name }}" /> {{name}} </td>
+				</tr>
+					{% endfor %}
+					<tr>
+					
+					<td> 源泉徴収率: </td>
+					<td><input type="text" size=3 name="rate" /></td>
 					<td> 時給 </td>
 					<td> <input type="text" size=3 name="price" />円</td>
 				</tr> 
-				{% endfor %}
 			</tbody>
 		</table>
 
