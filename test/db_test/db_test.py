@@ -58,3 +58,20 @@ def test_existing_dates():
     # Other dates aren't contained nor duplicated.
     eq_(len(l), 3)
     
+@with_setup(setup)
+def test_filterby_name_date():
+    session = open_session(TEST_SESSION_NAME)
+    record_iter = iterator_filterby_name_date(\
+                     session=session, \
+                     name=u"◆池田　涼太郎", \
+                     begindate=u"2013/05/23", \
+                     enddate=u"2013/05/24")
+    date, name = [], []
+    for entity in record_iter:
+        date.append(entity.date)
+        name.append(entity.name) 
+    eq_(len(date) , 4)
+    eq_(name.count(u"◆池田　涼太郎"), 4)
+    eq_(name.count(u"◆池田　達郎"), 0)
+    eq_(name.count(u"◆池田　瑛香"), 0)
+    eq_(date.count(u"2013/05/28"), 0)

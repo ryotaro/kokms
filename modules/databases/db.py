@@ -22,19 +22,6 @@ class KokmsCore(Base):
         self.mins = mins
         
 """
-Create session by given password.
-"""
-def open_session(password):
-    global current_session
-    engine = create_engine('sqlite:///' + password, echo=True, encoding="utf-8")
-    # Initial table creation.
-    KokmsCore.metadata.create_all(engine)
-    Session = sessionmaker()
-    Session.configure(bind=engine)
-    current_session = Session()
-    return current_session
-
-"""
 Enumerate names.
 """
 def iterator_name(session):
@@ -54,6 +41,15 @@ def iterator_existing_dates(session):
     for entity in entities:
         yield entity.date
 
+"""
+Return iterator 
+"""
+def iterator_filterby_name_date(session,name,begindate,enddate):
+    # execute sql
+    entities = session.query(KokmsCore)\
+               .filter(KokmsCore.name == name)\
+               .filter(KokmsCore.date.between(begindate, enddate))
+    return entities
 
 """
 Introduce the earliest date among the DB.
@@ -69,6 +65,18 @@ def get_maxdate(session):
     for entity in session.query(func.max(KokmsCore.date)):
         return entity[0]
 
+"""
+Create session by given password.
+"""
+def open_session(password):
+    global current_session
+    engine = create_engine('sqlite:///' + password, echo=True, encoding="utf-8")
+    # Initial table creation.
+    KokmsCore.metadata.create_all(engine)
+    Session = sessionmaker()
+    Session.configure(bind=engine)
+    current_session = Session()
+    return current_session
 
 
 """
@@ -76,6 +84,4 @@ Close current session and commit.
 """
 def close_session():
     current_session.commit()
-    
-    
     
