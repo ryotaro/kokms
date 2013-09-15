@@ -1,13 +1,16 @@
 from flask import Flask;
 from flask import render_template
 from flask import request
+from flask import url_for
 
 from logic.csvparser import parse_iter
-from databases.db import KokmsCore,open_session,close_session
+from logic.arithmetic import summation 
+from databases.db import *
+# from models.forms.forms import IndexForm
 
 from time import strftime
 from random import random 
-from hashlib import md5
+from hashlib import md5, sha256 
 
 import os
 import re
@@ -31,11 +34,11 @@ After uploading csv file (next to the index page).
     iv. No password is given.
 2. Display filtering screen    
 """
-@app.route('/upload',methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload_file():
     # Password check.
-    if upload_file_regex.match(request.form["password"] ):
-        password = request.form["password"]
+    if upload_file_regex.match(request.form["password"]):
+        password = sha256(request.form["password"]).hexdigest()
     else:
         return u"Error: Please set password."
     # file check.
@@ -43,10 +46,10 @@ def upload_file():
     if(f):
         print "file detected."
         file_name = md5(strftime('%Y%m%d%H%M%S') + str(random())).hexdigest()
-        file_path = os.path.join(os.getcwd(),"upload/" + file_name)
+        file_path = os.path.join(os.getcwd(), "upload/" + file_name)
         f.save(file_path)
         # parse csv
-        csv_dict = parse_iter(open(file_path,"r"))
+        csv_dict = parse_iter(open(file_path, "r"))
 
     # DB open 
     session = open_session(password)
@@ -57,26 +60,50 @@ def upload_file():
         session.query(KokmsCore).delete() 
         # Store from csv.
         for d in csv_dict:
-            record = KokmsCore(d['date'],d['time'],d['stat'],d['name'],d['mins'])
+            record = KokmsCore(d['date'], d['time'], d['stat'], d['name'], d['mins'])
             session.add(record)
 
     # if data is found, pass to next screen.
     if session.query(KokmsCore).count() != 0:
         param = {}
-        param['min_date'] = session.query(KokmsCore,func.min(KokmsCore.date)).date
-        param['max_date'] = session.query(KokmsCore,func.max(KokmsCore.date)).date
-        param['names'] = []
-        for username in session.query(KokmsCore).group_by(KokmsCore.username):
-            print username
+        names = [x for x in iterator_name(session)] 
+        dates = [x for x in iterator_existing_dates(session)]
+        close_session()
+        return render_template('selection.html'\
+                               , names=names\
+                               , dates=dates, \
+                                password=password)
 
-        # Construct dict.
-#         for entity in session.query(KokmsCore):
-#             print "This is", entity.date, entity.time, entity.stat, entity.name, entity.mins
-        #return render_template('selection.html',)
+    # Otherwise, please upload CSV!
+    return "Please upload CSV!"
 
-                    
-    close_session()
-    return "OK"
+@app.route('/display_meisai', methods=['POST'])
+def display_meisai():
+    if request.form['password']:
+        session = open_session(request.form['password'])
+    else :
+        # CSRF
+        return redirect(url_for('index'))
+
+    # Filter by name and price. 
+    filtered_entities = filterby_name_date(session, \
+                       request.form['target'], \
+                       request.form['begindate'], \
+                       request.form['enddate'])
+    # Summarize
+    summarized_data = summarize(filtered_entities)
+    metadata = summation(summarized_data, int(request.form['price']), float(request.form['rate']))
+    
+    # Output.
+#     import pdb
+#     pdb.set_trace()
+    return render_template("meisai.html",\
+                            name = request.form['target'],\
+                            rate = request.form['rate'],\
+                            title = request.form['title'],\
+                            price = request.form['price'],\
+                            summarize = summarized_data,\
+                            metadata = metadata)
     
 if __name__ == "__main__":
     app.run(debug=True)
