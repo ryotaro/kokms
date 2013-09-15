@@ -45,3 +45,16 @@ def test_max_date():
     session = open_session(TEST_SESSION_NAME)
     # mindate must be the pastest.
     eq_(get_maxdate(session) , u"2013/05/28")
+
+@with_setup(setup)
+def test_existing_dates():
+    session = open_session(TEST_SESSION_NAME)
+    existing_dates = iterator_existing_dates(session)
+    l = [x for x in existing_dates]
+    # All dates are correctly extracted
+    eq_(l.count(u"2013/05/28"), 1)
+    eq_(l.count(u"2013/05/24"), 1)
+    eq_(l.count(u"2013/05/23"), 1)
+    # Other dates aren't contained nor duplicated.
+    eq_(len(l), 3)
+    

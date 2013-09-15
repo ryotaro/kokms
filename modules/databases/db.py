@@ -45,6 +45,17 @@ def iterator_name(session):
         yield entity.name
 
 """
+Enumerate existing dates.
+"""
+def iterator_existing_dates(session):
+    # execute sql
+    entities = session.query(KokmsCore).group_by(KokmsCore.date)
+    # iterate over entity set
+    for entity in entities:
+        yield entity.date
+
+
+"""
 Introduce the earliest date among the DB.
 """
 def get_mindate(session):
@@ -57,6 +68,8 @@ Introduce the latest date among the DB.
 def get_maxdate(session):
     for entity in session.query(func.max(KokmsCore.date)):
         return entity[0]
+
+
 
 """
 Close current session and commit.
