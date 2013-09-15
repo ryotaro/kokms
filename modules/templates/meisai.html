@@ -1,0 +1,31 @@
+<html>
+	<head>
+	<title>{{title}} : {{name}}</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<h1>{{title}}</h1> 
+		<table border>
+			<tr><td colspan=3>従業員名称</td><td>{{name}}</td></tr>
+			<tr><td colspan=3>時給</td><td>{{price}}円</td></tr>
+			<tr><td colspan=3>源泉徴収率</td><td>{{rate}}</td></tr>
+			<tr><th colspan=4>勤怠</th></tr>
+			<tr><th>日付</th><th>開始時間</th><th>終了時間</th><th>就業時間(分)</th></tr>
+			{% for column in summarize %}
+				<tr>
+					<td>{{column.date}}</td>
+					<td>{{column.begintime}}</td>
+					<td>{{column.endtime}}</td>
+					<td>{{column.mins}}</td>
+				</tr>
+			{% endfor %}
+			<tr><th colspan=3>就業時間(分)</th><td>{{metadata.mins}}</td></tr>
+				<tr><th colspan=3>総支給額</th><td>{{metadata.summation}}</td></tr>
+				{% if rate_input == True %}
+				<tr><th colspan=3>源泉徴収率</th><td>{{rate}}</td></tr>
+				<tr><th colspan=3>源泉徴収額</th><td>{{metadata.subtract}}</td></tr>
+				{% endif %}
+				<tr><th colspan=3>支払額</th><td>{{metadata.payment}}</td></tr>
+		</table>
+	</body>
+</html>

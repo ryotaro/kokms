@@ -1,0 +1,45 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+		<title> Selection page </title>
+	</head>
+	<body>
+	<form method="post" action="/display_meisai">
+		<!-- Title input -->
+		ページタイトル<input type="text" size=20 name="title">
+		<br />
+		<!-- Date selection -->
+		<select name="begindate">
+		{% for date in dates %}
+			<option name="<{{ date }}"> {{ date }} </item> 
+		{% endfor %}
+		</select>
+
+		<select name="enddate">
+		{% for date in dates %}
+			<option name="<{{ date }}"> {{ date }} </item> 
+		{% endfor %}
+		</select>
+
+		<!-- Name enumeration -->
+		<table border>
+			<tbody>
+				{% for name in names %}
+				<tr>
+					<td> <input type="radio" name="target" value="{{ name }}" /> {{name}} </td>
+					<td> 源泉徴収: </td>
+					<td><input type="text" size=3 name="rate" />%</td>
+					<td> 時給 </td>
+					<td> <input type="text" size=3 name="price" />円</td>
+				</tr> 
+				{% endfor %}
+			</tbody>
+		</table>
+
+		<!-- password? -->
+		<input type="hidden" value="{{ password }}" name="password" />
+
+		<!-- Submission -->
+		<input type="submit" value="明細表示" />
+	</body>
+</html>
