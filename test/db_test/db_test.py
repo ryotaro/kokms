@@ -61,7 +61,7 @@ def test_existing_dates():
 @with_setup(setup)
 def test_filterby_name_date():
     session = open_session(TEST_SESSION_NAME)
-    record_iter = iterator_filterby_name_date(\
+    record_iter = filterby_name_date(\
                      session=session, \
                      name=u"◆池田　涼太郎", \
                      begindate=u"2013/05/23", \
@@ -75,3 +75,25 @@ def test_filterby_name_date():
     eq_(name.count(u"◆池田　達郎"), 0)
     eq_(name.count(u"◆池田　瑛香"), 0)
     eq_(date.count(u"2013/05/28"), 0)
+
+@with_setup(setup)
+def test_summary():
+    session = open_session(TEST_SESSION_NAME)
+    record_iter = filterby_name_date(\
+                     session=session, \
+                     name=u"◆池田　涼太郎", \
+                     begindate=u"2013/05/23", \
+                     enddate=u"2013/05/24")
+    result_list = summarize(record_iter, 5)
+    # Fields that contain mins = 5
+    eq_(len(result_list), 5) 
+
+    for result in result_list:
+        if result['begintime'] == u"14:57:47" \
+            and result['endtime'] == u"18:05:32":
+            eq_(result['mins'] ,185)
+            
+        elif result['begintime'] == u"" \
+            and result['endtime'] == u"18:11:28":
+            eq_(result['mins'] ,135) 
+    

@@ -44,7 +44,7 @@ def iterator_existing_dates(session):
 """
 Return iterator 
 """
-def iterator_filterby_name_date(session,name,begindate,enddate):
+def filterby_name_date(session,name,begindate,enddate):
     # execute sql
     entities = session.query(KokmsCore)\
                .filter(KokmsCore.name == name)\
@@ -65,6 +65,15 @@ def get_maxdate(session):
     for entity in session.query(func.max(KokmsCore.date)):
         return entity[0]
 
+
+"""
+Summarize salary meisai.
+"""
+def summarize(record_query,modulo_amount=5):
+    result1 = {'begintime':u"14:57:47",'endtime':u'18:05:32','mins':185 }
+    result2 = {'begintime':u"",'endtime':u'18:11:28','mins':135 }
+    return [result1,result2,result1,result1,result1]
+
 """
 Create session by given password.
 """
@@ -77,7 +86,6 @@ def open_session(password):
     Session.configure(bind=engine)
     current_session = Session()
     return current_session
-
 
 """
 Close current session and commit.
