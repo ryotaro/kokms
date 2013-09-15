@@ -15,20 +15,30 @@ import re
 upload_file_regex = re.compile('[0-9a-zA-Z_-]{1,32}')
 app = Flask(__name__)
 
+"""
+Initial screen.
+"""
 @app.route('/')
-def hello_world():
+def index():
     return render_template("index.html")
 
+"""
+After uploading csv file (next to the index page).
+1. Display error screen with index.html:
+    i.  No CSV uploaded && No current DB is found according to password.
+    ii. No POST method request(405 Error)
+    iii.Other exception regarding CSV parsing
+    iv. No password is given.
+2. Display filtering screen    
+"""
 @app.route('/upload',methods=['POST'])
 def upload_file():
-    # Acquire file from client
-    if request.method != "POST":
-        return u"Error: Please upload csv file!"
+    # Password check.
     if upload_file_regex.match(request.form["password"] ):
         password = request.form["password"]
     else:
         return u"Error: Please set password."
-
+    # file check.
     f = request.files['csvfile']
     if(f):
         print "file detected."
@@ -43,19 +53,27 @@ def upload_file():
 
     # if CSV is uploaded, store them into databases.
     if(f):
-        print "Storing DB"
         # Drop current all DB.
         session.query(KokmsCore).delete() 
         # Store from csv.
         for d in csv_dict:
             record = KokmsCore(d['date'],d['time'],d['stat'],d['name'],d['mins'])
             session.add(record)
-            
-    #  if not uploaded, try to fetch from current DB.
-    else:
-        print "no data."
-        for entity in session.query(KokmsCore):
-            print "This is", entity.date, entity.time, entity.stat, entity.name, entity.mins
+
+    # if data is found, pass to next screen.
+    if session.query(KokmsCore).count() != 0:
+        param = {}
+        param['min_date'] = session.query(KokmsCore,func.min(KokmsCore.date)).date
+        param['max_date'] = session.query(KokmsCore,func.max(KokmsCore.date)).date
+        param['names'] = []
+        for username in session.query(KokmsCore).group_by(KokmsCore.username):
+            print username
+
+        # Construct dict.
+#         for entity in session.query(KokmsCore):
+#             print "This is", entity.date, entity.time, entity.stat, entity.name, entity.mins
+        #return render_template('selection.html',)
+
                     
     close_session()
     return "OK"
