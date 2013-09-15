@@ -39,7 +39,7 @@ Enumerate names.
 """
 def iterator_name(session):
     # execute sql
-    entities = session.query(KokmsCore).group_by(KokmsCore.name)
+    entities = session.query(KokmsCore).group_by(KokmsCore.name).order_by(KokmsCore.name)
     # iterate over entity set
     for entity in entities:
         yield entity.name
@@ -49,7 +49,7 @@ Enumerate existing dates.
 """
 def iterator_existing_dates(session):
     # execute sql
-    entities = session.query(KokmsCore).group_by(KokmsCore.date)
+    entities = session.query(KokmsCore).group_by(KokmsCore.date).order_by(KokmsCore.date)
     # iterate over entity set
     for entity in entities:
         yield entity.date
