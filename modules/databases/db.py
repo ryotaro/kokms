@@ -3,6 +3,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import *
 from sqlalchemy.orm import *
+from sqlalchemy import or_
 
 Base = declarative_base()
 class KokmsCore(Base):
@@ -73,12 +74,13 @@ def summarize(record_query, modulo_amount=5):
     # Introduce mins-only columns.
     mins_only = record_query.filter(KokmsCore.mins != None).filter(KokmsCore.mins != u'')
     # Introduce non-mins-only columns.
-    nonmins_only = record_query.filter(KokmsCore.mins == None)
+    nonmins_only = record_query.filter(or_(KokmsCore.mins == None,KokmsCore.mins == u''))
     ret = []
     for mins_column in mins_only : 
         result_dic = {'endtime' : mins_column.time , \
                       'mins':mins_column.mins - (mins_column.mins % modulo_amount), \
-                      'begintime':None}
+                      'begintime':None,
+                      'date':mins_column.date}
         nonmins_column = nonmins_only.filter(KokmsCore.date == mins_column.date)
         for column in nonmins_column:
             result_dic['begintime'] = column.time
