@@ -15,6 +15,8 @@ def parse_csv_iter(fp):
 
 def parse_iter(fp):
     for line in parse_csv_iter(fp):
+        if len(line) <= 0:
+            continue
         line = map(__decode,line)
         # map
         result_map = dict()
