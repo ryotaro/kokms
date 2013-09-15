@@ -71,7 +71,7 @@ Summarize salary meisai.
 """
 def summarize(record_query, modulo_amount=5):
     # Introduce mins-only columns.
-    mins_only = record_query.filter(KokmsCore.mins != None)
+    mins_only = record_query.filter(KokmsCore.mins != None).filter(KokmsCore.mins != u'')
     # Introduce non-mins-only columns.
     nonmins_only = record_query.filter(KokmsCore.mins == None)
     ret = []
@@ -83,7 +83,7 @@ def summarize(record_query, modulo_amount=5):
         for column in nonmins_column:
             result_dic['begintime'] = column.time
             break
-        ret.append(result_dic)
+        ret.append(result_dic) 
     return ret 
 
 """
