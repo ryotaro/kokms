@@ -92,7 +92,16 @@ def display_meisai():
                        request.form['enddate'])
     # Summarize
     summarized_data = summarize(filtered_entities)
-    metadata = summation(summarized_data, int(request.form['price']), float(request.form['rate']))
+    
+    if request.form['rate']:
+        rate = float(request.form['rate'])  
+        rate_input = True
+        if rate <= 0: rate_input = False
+    else:
+        rate = 0.0
+        rate_input = False
+
+    metadata = summation(summarized_data, int(request.form['price']), rate)
     
     # Output.
 #     import pdb
@@ -103,7 +112,8 @@ def display_meisai():
                             title = request.form['title'],\
                             price = request.form['price'],\
                             summarize = summarized_data,\
-                            metadata = metadata)
+                            metadata = metadata, \
+                            rate_input = rate_input)
     
 if __name__ == "__main__":
     app.run(debug=True)
