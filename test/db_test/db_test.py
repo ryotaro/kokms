@@ -85,15 +85,15 @@ def test_summary():
                      begindate=u"2013/05/23", \
                      enddate=u"2013/05/24")
     result_list = summarize(record_iter, 5)
-    # Fields that contain mins = 5
-    eq_(len(result_list), 5) 
+    # Fields that contain mins = 3
+    eq_(len(result_list), 3) 
 
     for result in result_list:
         if result['begintime'] == u"14:57:47" \
             and result['endtime'] == u"18:05:32":
             eq_(result['mins'] ,185)
             
-        elif result['begintime'] == u"" \
+        elif result['begintime'] == None \
             and result['endtime'] == u"18:11:28":
             eq_(result['mins'] ,135) 
     

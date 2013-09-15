@@ -70,9 +70,25 @@ def get_maxdate(session):
 Summarize salary meisai.
 """
 def summarize(record_query,modulo_amount=5):
-    result1 = {'begintime':u"14:57:47",'endtime':u'18:05:32','mins':185 }
-    result2 = {'begintime':u"",'endtime':u'18:11:28','mins':135 }
-    return [result1,result2,result1,result1,result1]
+    # Introduce mins-only columns.
+    mins_only = record_query.filter(KokmsCore.mins != None)
+    # Introduce non-mins-only columns.
+    nonmins_only = record_query.filter(KokmsCore.mins == None)
+    ret = []
+    for mins_column in mins_only : 
+        result_dic = {'endtime' : mins_column.time ,\
+                      'mins':mins_column.mins - (mins_column.mins % modulo_amount),\
+                      'begintime':None}
+        nonmins_column = nonmins_only.filter(KokmsCore.date == mins_column.date)
+        for column in nonmins_column:
+            result_dic['begintime'] = column.time
+            break
+        ret.append(result_dic)
+    return ret
+
+#     result1 = {'begintime':u"14:57:47",'endtime':u'18:05:32','mins':185 }
+#     result2 = {'begintime':u"",'endtime':u'18:11:28','mins':135 }
+#     return [result1,result2,result1,result1,result1]
 
 """
 Create session by given password.
