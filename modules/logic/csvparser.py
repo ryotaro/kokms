@@ -4,35 +4,36 @@ CSV parser for KOKMS.
 import csv
 import StringIO
 import chardet
-
+import StringIO
+import codecs
 def parse_csv_iter(fp):
+    import pdb
+    pdb.set_trace()
 #     reader = csv.reader(__enc_fp(fp), dialect=u"excel", \
 #                         delimiter=",", lineterminator="\n", quotechar="\"")
-    reader = csv.reader(fp, dialect=u"excel", \
+    # Use StringIO to eliminate BOM.
+    str_fp = StringIO.StringIO()
+    file_string_all = fp.read()
+    # Propagate encode and remove BOM if necessary.
+    detect = chardet.detect(file_string_all)
+    file_string_all = file_string_all.decode(detect['encoding'])
+    if detect['encoding'] == "UTF-8":
+        # remove BOM
+        file_string_all = \
+        file_string_all.lstrip(codecs.BOM_UTF8.decode('UTF-8'))
+    str_fp.write(file_string_all.encode('UTF-8'))
+    str_fp.seek(0)
+    reader = csv.reader(str_fp, dialect=u"excel", \
                         delimiter=",", lineterminator="\n", quotechar="\"")
     for line in reader:
-        yield line
+        yield map(lambda x: x.decode(detect['encoding']), line)
 
 def parse_iter(fp):
     for line in parse_csv_iter(fp):
         if len(line) <= 0:
             continue
-        line = map(__decode,line)
-        # map
         result_map = dict()
         for i,key in enumerate(('date','time','stat','name','mins')) :
             result_map[key] = line[i]
-        yield result_map   
+        yield result_map
 
-"""
-Wrapper for fp to convert desired target encoding automatically.
-"""
-def __decode(line):
-    if len(line) == 0 : return u''
-    # workaround.
-    detect = chardet.detect(line)
-    if detect['confidence'] < 0.55 : 
-        raise IOError('Encoding error, confidence is too low.')
-    line = line.decode(detect['encoding']) 
-    # rewind enc_fp and return. 
-    return line
